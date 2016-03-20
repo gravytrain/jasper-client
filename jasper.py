@@ -107,22 +107,13 @@ class Jasper(object):
                        stt_engine_class.get_active_instance())
 
     def run(self):
-        if 'first_name' in self.config:
-            salutation = ("How can I be of service, %s?"
-                          % self.config["first_name"])
-        else:
-            salutation = "How can I be of service?"
+        salutation = "I am now, fully online"
         self.mic.say(salutation)
 
-        conversation = Conversation("JASPER", self.mic, self.config)
+        conversation = Conversation("FRIDAY", self.mic, self.config)
         conversation.handleForever()
 
 if __name__ == "__main__":
-
-    print("*******************************************************")
-    print("*             JASPER - THE TALKING COMPUTER           *")
-    print("* (c) 2015 Shubhro Saha, Charlie Marsh & Jan Holthuis *")
-    print("*******************************************************")
 
     logging.basicConfig()
     logger = logging.getLogger()

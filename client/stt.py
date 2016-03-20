@@ -35,7 +35,7 @@ class AbstractSTTEngine(object):
         if cls.VOCABULARY_TYPE:
             vocabulary = cls.VOCABULARY_TYPE(vocabulary_name,
                                              path=jasperpath.config(
-                                                 'vocabularies'))
+                                                     'vocabularies'))
             if not vocabulary.matches_phrases(phrases):
                 vocabulary.compile(phrases)
             config['vocabulary'] = vocabulary
@@ -71,7 +71,7 @@ class PocketSphinxSTT(AbstractSTTEngine):
     VOCABULARY_TYPE = vocabcompiler.PocketsphinxVocabulary
 
     def __init__(self, vocabulary, hmm_dir="/usr/local/share/" +
-                 "pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k"):
+                                           "pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k"):
 
         """
         Initiates the pocketsphinx instance.
@@ -170,7 +170,7 @@ class PocketSphinxSTT(AbstractSTTEngine):
             f.truncate()
 
         transcribed = [result[0]]
-        self._logger.info('Transcribed: %r', transcribed)
+        self._logger.info('Engine: %r | Transcribed: %r ', self.SLUG, transcribed)
         return transcribed
 
     @classmethod
@@ -187,8 +187,8 @@ class JuliusSTT(AbstractSTTEngine):
     VOCABULARY_TYPE = vocabcompiler.JuliusVocabulary
 
     def __init__(self, vocabulary=None, hmmdefs="/usr/share/voxforge/julius/" +
-                 "acoustic_model_files/hmmdefs", tiedlist="/usr/share/" +
-                 "voxforge/julius/acoustic_model_files/tiedlist"):
+                                                "acoustic_model_files/hmmdefs", tiedlist="/usr/share/" +
+                                                                                         "voxforge/julius/acoustic_model_files/tiedlist"):
         self._logger = logging.getLogger(__name__)
         self._vocabulary = vocabulary
         self._hmmdefs = hmmdefs
@@ -261,7 +261,7 @@ class JuliusSTT(AbstractSTTEngine):
                        if text]
         if not transcribed:
             transcribed.append('')
-        self._logger.info('Transcribed: %r', transcribed)
+        self._logger.info('Engine: %r | Transcribed: %r ', self.SLUG, transcribed)
         return transcribed
 
     @classmethod
@@ -346,8 +346,8 @@ class GoogleSTT(AbstractSTTEngine):
                                       'maxresults': 6,
                                       'pfilter': 2})
             self._request_url = urlparse.urlunparse(
-                ('https', 'www.google.com', '/speech-api/v2/recognize', '',
-                 query, ''))
+                    ('https', 'www.google.com', '/speech-api/v2/recognize', '',
+                     query, ''))
         else:
             self._request_url = None
 
@@ -419,7 +419,7 @@ class GoogleSTT(AbstractSTTEngine):
         else:
             # Convert all results to uppercase
             results = tuple(result.upper() for result in results)
-            self._logger.info('Transcribed: %r', results)
+            self._logger.info('Engine: %r | Transcribed: %r ', self.SLUG, results)
         return results
 
     @classmethod
@@ -519,7 +519,7 @@ class AttSTT(AbstractSTTEngine):
                 transcribed = [x[0].upper() for x in sorted(results,
                                                             key=lambda x: x[1],
                                                             reverse=True)]
-                self._logger.info('Transcribed: %r', transcribed)
+                self._logger.info('Engine: %r | Transcribed: %r ', self.SLUG, transcribed)
                 return transcribed
 
     def _get_response(self, data):
@@ -592,7 +592,7 @@ class WitAiSTT(AbstractSTTEngine):
                           headers=self.headers)
         try:
             r.raise_for_status()
-            text = r.json()['_text']
+            response = r.json()
         except requests.exceptions.HTTPError:
             self._logger.critical('Request failed with response: %r',
                                   r.text,
@@ -611,9 +611,10 @@ class WitAiSTT(AbstractSTTEngine):
             return []
         else:
             transcribed = []
-            if text:
-                transcribed.append(text.upper())
-            self._logger.info('Transcribed: %r', transcribed)
+            if response:
+                transcribed.append(self.SLUG)
+                transcribed.append(response)
+            self._logger.info('Engine: %r | Transcribed: %r ', self.SLUG, transcribed)
             return transcribed
 
     @classmethod
@@ -634,7 +635,7 @@ def get_engine_by_slug(slug=None):
         raise TypeError("Invalid slug '%s'", slug)
 
     selected_engines = filter(lambda engine: hasattr(engine, "SLUG") and
-                              engine.SLUG == slug, get_engines())
+                                             engine.SLUG == slug, get_engines())
     if len(selected_engines) == 0:
         raise ValueError("No STT engine found for slug '%s'" % slug)
     else:
@@ -656,6 +657,7 @@ def get_engines():
             subclasses.add(subclass)
             subclasses.update(get_subclasses(subclass))
         return subclasses
+
     return [tts_engine for tts_engine in
             list(get_subclasses(AbstractSTTEngine))
             if hasattr(tts_engine, 'SLUG') and tts_engine.SLUG]

@@ -5,7 +5,6 @@ import jasperpath
 
 
 class Brain(object):
-
     def __init__(self, mic, profile):
         """
         Instantiates a new Brain object, which cross-references user
@@ -53,7 +52,7 @@ class Brain(object):
                     logger.warning("Skipped module '%s' because it misses " +
                                    "the WORDS constant.", name)
         modules.sort(key=lambda mod: mod.PRIORITY if hasattr(mod, 'PRIORITY')
-                     else 0, reverse=True)
+        else 0, reverse=True)
         return modules
 
     def query(self, texts):
@@ -64,13 +63,14 @@ class Brain(object):
         Arguments:
         text -- user input, typically speech, to be parsed by a module
         """
+
         for module in self.modules:
             for text in texts:
                 if module.isValid(text):
                     self._logger.debug("'%s' is a valid phrase for module " +
                                        "'%s'", text, module.__name__)
                     try:
-                        module.handle(text, self.mic, self.profile)
+                        module.handle(text, self.mic, self.profile, texts)
                     except Exception:
                         self._logger.error('Failed to execute module',
                                            exc_info=True)

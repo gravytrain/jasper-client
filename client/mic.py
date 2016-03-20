@@ -94,7 +94,7 @@ class Mic:
 
         THRESHOLD_MULTIPLIER = 1.8
         RATE = 16000
-        CHUNK = 1024
+        CHUNK = 256
 
         # number of seconds to allow to establish threshold
         THRESHOLD_TIME = 1
@@ -118,8 +118,12 @@ class Mic:
         # calculate the long run average, and thereby the proper threshold
         for i in range(0, RATE / CHUNK * THRESHOLD_TIME):
 
-            data = stream.read(CHUNK)
-            frames.append(data)
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+            except IOError as e:
+                print e
+                break
 
             # save this data point as a score
             lastN.pop(0)
@@ -138,12 +142,16 @@ class Mic:
         # start passively listening for disturbance above threshold
         for i in range(0, RATE / CHUNK * LISTEN_TIME):
 
-            data = stream.read(CHUNK)
-            frames.append(data)
-            score = self.getScore(data)
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+                score = self.getScore(data)
 
-            if score > THRESHOLD:
-                didDetect = True
+                if score > THRESHOLD:
+                    didDetect = True
+                    break
+            except IOError as e:
+                print e
                 break
 
         # no use continuing if no flag raised
@@ -160,8 +168,12 @@ class Mic:
         DELAY_MULTIPLIER = 1
         for i in range(0, RATE / CHUNK * DELAY_MULTIPLIER):
 
-            data = stream.read(CHUNK)
-            frames.append(data)
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+            except IOError as e:
+                print e
+                break
 
         # save the audio data
         stream.stop_stream()
@@ -226,17 +238,21 @@ class Mic:
 
         for i in range(0, RATE / CHUNK * LISTEN_TIME):
 
-            data = stream.read(CHUNK)
-            frames.append(data)
-            score = self.getScore(data)
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+                score = self.getScore(data)
 
-            lastN.pop(0)
-            lastN.append(score)
+                lastN.pop(0)
+                lastN.append(score)
 
-            average = sum(lastN) / float(len(lastN))
+                average = sum(lastN) / float(len(lastN))
 
-            # TODO: 0.8 should not be a MAGIC NUMBER!
-            if average < THRESHOLD * 0.8:
+                # TODO: 0.8 should not be a MAGIC NUMBER!
+                if average < THRESHOLD * 0.8:
+                    break
+            except IOError as e:
+                print e
                 break
 
         self.speaker.play(jasperpath.data('audio', 'beep_lo.wav'))
