@@ -89,7 +89,7 @@ class Brain(object):
                 if plugin.is_valid(text):
                     self._logger.debug("'%s' is a valid phrase for module " +
                                        "'%s'", text, plugin.info.name)
-                    return (plugin, text)
+                    return (plugin, text, texts)
         self._logger.debug("No module was able to handle any of these " +
                            "phrases: %r", texts)
         return (None, None)
