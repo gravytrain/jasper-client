@@ -37,9 +37,7 @@ class Conversation(i18n.GettextMixin):
                 self._logger.info("Received notification: '%s'", str(notif))"""
 
             input = self.mic.listen()
-
-
-
+            self._logger.debug(input)
             if input:
                 plugin, text, texts = self.brain.query(input)
                 if plugin and text:

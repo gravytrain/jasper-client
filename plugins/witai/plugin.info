@@ -1,9 +1,9 @@
 [Plugin]
-Name = julius-stt
+Name = witai
 Version = 1.0.0
 License = MIT
 URL = http://jasperproject.github.io/
-Description = A very basic Speech-to-Text engine using Julius.
+Description = Do things with witai
 
 [Author]
 Name = Jasper Project
