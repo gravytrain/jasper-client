@@ -63,7 +63,7 @@ class AudioDevice(object):
 
     @abc.abstractmethod
     @contextlib.contextmanager
-    def open_stream(self, bits, channels, rate, chunksize=1024, output=True):
+    def open_stream(self, bits, channels, rate, chunksize=4096, output=True):
         pass
 
     @abc.abstractmethod
@@ -88,7 +88,7 @@ class AudioDevice(object):
                 else:
                     yield frame
 
-    def play_fp(self, fp, chunksize=1024, add_padding=False):
+    def play_fp(self, fp, chunksize=4096, add_padding=False):
         w = wave.open(fp, 'rb')
         channels = w.getnchannels()
         bits = w.getsampwidth()*8

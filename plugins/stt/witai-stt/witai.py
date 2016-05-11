@@ -51,7 +51,7 @@ class WitAiSTTPlugin(plugin.STTPlugin):
                           headers=self.headers)
         try:
             r.raise_for_status()
-            text = r.json()['_text']
+            text = r.json()
         except requests.exceptions.HTTPError:
             self._logger.critical('Request failed with response: %r',
                                   r.text,
@@ -69,6 +69,6 @@ class WitAiSTTPlugin(plugin.STTPlugin):
                                   exc_info=True)
             return []
         else:
-            transcribed = [text.upper()]
+            transcribed = ['witai-stt', text]
             self._logger.info('Transcribed: %r', transcribed)
             return transcribed

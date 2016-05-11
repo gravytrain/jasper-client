@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-from . import paths
+
 from . import i18n
+from . import paths
+
+
 #  from notifier import Notifier
 
 
@@ -19,11 +22,7 @@ class Conversation(i18n.GettextMixin):
         #  self.notifier = Notifier(profile)
 
     def greet(self):
-        if 'first_name' in self.profile:
-            salutation = (self.gettext("How can I be of service, %s?")
-                          % self.profile["first_name"])
-        else:
-            salutation = self.gettext("How can I be of service?")
+        salutation = self.gettext("I am now fully online")
         self.mic.say(salutation)
 
     def handleForever(self):
@@ -39,17 +38,20 @@ class Conversation(i18n.GettextMixin):
 
             input = self.mic.listen()
 
+
+
             if input:
-                plugin, text = self.brain.query(input)
+                plugin, text, texts = self.brain.query(input)
                 if plugin and text:
                     try:
-                        plugin.handle(text, self.mic)
+                        self._logger.debug('Text is : %s', text)
+                        plugin.handle(text, self.mic, texts)
                     except Exception:
                         self._logger.error('Failed to execute module',
                                            exc_info=True)
                         self.mic.say(self.gettext(
-                            "I'm sorry. I had some trouble with that " +
-                            "operation. Please try again later."))
+                                "I'm sorry. I had some trouble with that " +
+                                "operation. Please try again later."))
                     else:
                         self._logger.debug("Handling of phrase '%s' by " +
                                            "module '%s' completed", text,

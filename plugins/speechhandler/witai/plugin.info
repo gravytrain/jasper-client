@@ -1,0 +1,10 @@
+[Plugin]
+Name = witai
+Version = 1.0.0
+License = MIT
+URL = http://jasperproject.github.io/
+Description = Do things with witai
+
+[Author]
+Name = Jasper Project
+URL = http://jasperproject.github.io/
